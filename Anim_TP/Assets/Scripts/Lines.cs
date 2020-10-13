@@ -5,7 +5,7 @@ using UnityEngine;
 public class Lines : MonoBehaviour
 {
 
-    public List<Vector3> vertices;
+    public List<GameObject> points;
     public List<int> lines;
 
     private LineRenderer lr;
@@ -15,9 +15,12 @@ public class Lines : MonoBehaviour
     {
         lr = GetComponent<LineRenderer>();
         lr.positionCount = lines.Count;
+
         for (int i = 0; i < lines.Count; i+=2) {
-            lr.SetPosition(i, vertices[lines[i]]);
-            lr.SetPosition(i+1, vertices[lines[i+1]]);
+
+            lr.SetPosition(i, points[lines[i]].transform.position);
+            lr.SetPosition(i+1, points[lines[i+1]].transform.position);
+
         }
     }
 
