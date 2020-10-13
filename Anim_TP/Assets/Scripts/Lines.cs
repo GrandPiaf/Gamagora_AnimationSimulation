@@ -4,29 +4,33 @@ using UnityEngine;
 
 public class Lines : MonoBehaviour
 {
-
-    public List<GameObject> points;
-    public List<int> lines;
+    public List<Segment> segments;
 
     private LineRenderer lr;
 
-    // Start is called before the first frame update
+    void Start() {
+        //segments = new List<Segment>(GameObject.Find("Segments").GetComponentsInChildren<Segment>());
+    }
+
+
     void Update()
     {
         lr = GetComponent<LineRenderer>();
-        lr.positionCount = lines.Count;
+        lr.positionCount = segments.Count * 2;
 
-        for (int i = 0; i < lines.Count; i+=2) {
+        for (int i = 0; i < segments.Count; i++) {
 
-            lr.SetPosition(i, points[lines[i]].transform.position);
-            lr.SetPosition(i+1, points[lines[i+1]].transform.position);
+            lr.SetPosition( (i * 2)    , segments[i].left.transform.position);
+            lr.SetPosition( (i * 2) + 1, segments[i].right.transform.position);
 
         }
     }
 
     void OnDrawGizmos() {
-        for (int i = 0; i < lines.Count; i += 2) {
-            Gizmos.DrawLine(points[lines[i]].transform.position, points[lines[i + 1]].transform.position);
+        for (int i = 0; i < segments.Count; i++) {
+            if (segments[i] != null) {
+                Gizmos.DrawLine(segments[i].left.transform.position, segments[i].right.transform.position);
+            }
         }
     }
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Drag : MonoBehaviour {
+public class JointDrag : MonoBehaviour {
 
     void OnMouseDrag() {
         Vector3 move = transform.position;
