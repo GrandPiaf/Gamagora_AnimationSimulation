@@ -14,4 +14,8 @@ public class Segment : MonoBehaviour
 
     // Distance to respect between both joints
     private float distanceSquared;
+
+    void Start() {
+        distanceSquared = Vector3.SqrMagnitude( right.transform.position - left.transform.position );
+    }
 }

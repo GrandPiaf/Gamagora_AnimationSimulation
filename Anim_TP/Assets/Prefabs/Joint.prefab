@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 3193837450246351884}
   - component: {fileID: 395628216451871991}
   - component: {fileID: 8116618212758856038}
-  - component: {fileID: 8333185423913939586}
   - component: {fileID: 3834553204617211137}
   m_Layer: 0
   m_Name: Joint
@@ -111,18 +110,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &8333185423913939586
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2160479120706862505}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fbfac2f45a882e844a21f16f8e450621, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &3834553204617211137
 MonoBehaviour:
   m_ObjectHideFlags: 0
