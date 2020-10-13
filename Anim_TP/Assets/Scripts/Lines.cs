@@ -24,4 +24,10 @@ public class Lines : MonoBehaviour
         }
     }
 
+    void OnDrawGizmos() {
+        for (int i = 0; i < lines.Count; i += 2) {
+            Gizmos.DrawLine(points[lines[i]].transform.position, points[lines[i + 1]].transform.position);
+        }
+    }
+
 }
