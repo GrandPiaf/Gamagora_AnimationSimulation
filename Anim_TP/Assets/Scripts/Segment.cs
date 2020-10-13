@@ -6,16 +6,22 @@ using UnityEngine;
  * Represents a bone between 2 joints for a skeleton
  * Can have constraints (distances)
  */
-public class Segment : MonoBehaviour
+public class Segment
 {
     // Joints
-    public Joint left;
-    public Joint right;
+    public readonly Joint left;
+    public readonly Joint right;
 
     // Distance to respect between both joints
-    private float distanceSquared;
+    public readonly float distance;
 
-    void Start() {
-        distanceSquared = Vector3.SqrMagnitude( right.transform.position - left.transform.position );
+    public Segment(Joint left, Joint right) {
+        this.left = left;
+        this.right = right;
+        distance = CalculateDistance();
+    }
+
+    public float CalculateDistance() {
+        return (right.transform.position - left.transform.position).magnitude;
     }
 }

@@ -1,15 +1,15 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Skeleton : MonoBehaviour
 {
     // Entry data
-    public List<Segment> segments;
+    public List<Joint> joints;
     public Joint target;
 
-    // Results
-    private List<Segment> segmentsResults;
+    private List<Segment> segments;
 
     // Renderer
     private LineRenderer lr;
@@ -18,8 +18,44 @@ public class Skeleton : MonoBehaviour
 
         lr = GetComponent<LineRenderer>();
 
-        // Create result list
-        segmentsResults = new List<Segment>(segments);
+        // Compute segments
+        segments = new List<Segment>();
+        for (int i = 0; i < joints.Count - 1; i++) {
+            segments.Add(new Segment(joints[i], joints[i + 1]));
+        }
+
+        // Compute inverse kinematics
+        inverseKinematics(5);
+    }
+
+    private void inverseKinematics(int nbIterations) {
+
+        // Place Joint on target
+        // Resolve constraints as we rewind the list
+
+        Vector3 initialPos = joints[0].transform.position;
+        Vector3 targetPos = target.transform.position;
+
+        for (int ite = 0; ite < nbIterations; ite++) {
+
+            joints.Reverse();
+            segments.Reverse();
+
+            joints[0].transform.position = targetPos;
+            for (int i = 0; i < segments.Count; i++) {
+                segments[i].left.transform.position = segments[i].right.transform.position + segments[i].distance * (segments[i].left.transform.position - segments[i].right.transform.position).normalized;
+            }
+
+            joints.Reverse();
+            segments.Reverse();
+
+            joints[0].transform.position = initialPos;
+            for (int i = 0; i < segments.Count; i++) {
+                segments[i].right.transform.position = segments[i].left.transform.position + segments[i].distance * (segments[i].right.transform.position - segments[i].left.transform.position).normalized;
+            }
+
+        }
+
     }
 
     void Update() {
@@ -32,10 +68,8 @@ public class Skeleton : MonoBehaviour
     }
 
     void OnDrawGizmos() {
-        for (int i = 0; i < segments.Count; i++) {
-            if (segments[i] != null) {
-                Gizmos.DrawLine(segments[i].left.transform.position, segments[i].right.transform.position);
-            }
+        for (int i = 0; i < joints.Count - 1; i++) {
+            Gizmos.DrawLine(joints[i].transform.position, joints[i+1].transform.position);
         }
     }
 
