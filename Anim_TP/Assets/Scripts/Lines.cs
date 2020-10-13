@@ -11,7 +11,7 @@ public class Lines : MonoBehaviour
     private LineRenderer lr;
 
     // Start is called before the first frame update
-    void Start()
+    void Update()
     {
         lr = GetComponent<LineRenderer>();
         lr.positionCount = lines.Count;
