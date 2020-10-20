@@ -18,7 +18,7 @@ public class Particle : MonoBehaviour
         Vector3 acceleration = (-mass * g * gravity - velocity * velocity.magnitude) / mass;
 
         //Compute next velocity
-        velocity = velocity + Time.deltaTime * acceleration;
+        Vector3 nextVelocity = velocity + Time.deltaTime * acceleration;
 
         //Compute next position
         Vector3 nextPosition = transform.position + Time.deltaTime * velocity;
@@ -35,6 +35,7 @@ public class Particle : MonoBehaviour
             nextPosition.x = 8f;
         }
 
+        velocity = nextVelocity;
         transform.position = nextPosition;
 
     }

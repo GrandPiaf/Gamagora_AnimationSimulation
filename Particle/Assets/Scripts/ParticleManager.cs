@@ -23,6 +23,9 @@ public class ParticleManager : MonoBehaviour
 
     void Start() {
 
+        // Seeding random
+        Random.InitState(247943128);
+
         particles = new List<GameObject>(nbParticles);
 
         for (int i = 0; i < nbParticles; i++) {
