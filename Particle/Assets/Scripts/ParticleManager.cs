@@ -16,7 +16,15 @@ public class ParticleManager : MonoBehaviour
         particles = new List<GameObject>(nbParticles);
 
         for (int i = 0; i < nbParticles; i++) {
-            particles.Add( Instantiate(particle, new Vector3((UnityEngine.Random.value - 0.5f) * 16, (UnityEngine.Random.value - 0.5f) * 8), Quaternion.identity) );
+            particles.Add( Instantiate(particle, new Vector3((Random.value - 0.5f) * 16, (Random.value - 0.5f) * 8), Quaternion.identity) );
+            particles[i].GetComponent<SpriteRenderer>().material.color = new Color(
+                Random.Range(0f, 1f),
+                Random.Range(0f, 1f),
+                Random.Range(0f, 1f),
+                1
+            );
+            particles[i].GetComponent<Particle>().mass = Random.Range(1f, 10f);
+            particles[i].GetComponent<Particle>().velocity = (Vector3.up + Vector3.right) * 10f;
         }
     }
 
