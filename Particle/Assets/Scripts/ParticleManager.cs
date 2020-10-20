@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class ParticleManager : MonoBehaviour
@@ -34,10 +36,14 @@ public class ParticleManager : MonoBehaviour
 
     public float deltaTime;
 
+    private Dictionary<Tuple<int, int>, List<Particle>> grid;
+
+
+
     void Start() {
 
         // Seeding random
-        Random.InitState(247943128);
+        UnityEngine.Random.InitState(247943128);
 
         particles = new List<Particle>(nbParticles);
 
@@ -45,13 +51,13 @@ public class ParticleManager : MonoBehaviour
 
             //Create particle i
             Vector3 particlePos = new Vector3(
-                Random.Range(-xRange, xRange),
-                Random.Range(-yRange, yRange)
+                UnityEngine.Random.Range(-xRange, xRange),
+                UnityEngine.Random.Range(-yRange, yRange)
             );
             particles.Add( Instantiate(particle, particlePos, Quaternion.identity).GetComponent<Particle>() );
             
             // Settings velocity & random mass from range [1f, 10f]
-            float mass = Random.Range(lowerMass, upperMass);
+            float mass = UnityEngine.Random.Range(lowerMass, upperMass);
             particles[i].mass = mass;
             particles[i].velocity = (Vector3.up) * 10f;
             //particles[i].GetComponent<Particle>().velocity = (Vector3.up + Vector3.right) * 10f;
@@ -69,6 +75,8 @@ public class ParticleManager : MonoBehaviour
 
     void Update() {
 
+        sortParticles();
+
         // Apply gravity
         /* lines 1 - 3  &  lines 6 - 10 */
         applyGravity();
@@ -80,11 +88,40 @@ public class ParticleManager : MonoBehaviour
         computeNextVelocity();
     }
 
+
+    private void sortParticles() {
+
+        // Create Dictionary
+        grid = new Dictionary<Tuple<int, int>, List<Particle>>();
+
+        // For each particle, sort it in the correct cell
+        foreach (Particle particle in particles) {
+
+            Tuple<int, int> particleCell = getCellFromParticle(particle);
+
+            if (!grid.ContainsKey(particleCell)) {
+                grid.Add(particleCell, new List<Particle>());
+            }
+
+            grid[particleCell].Add(particle);
+
+        }
+
+    }
+
+    private Tuple<int, int> getCellFromParticle(Particle particle) {
+
+        return Tuple.Create(
+            Convert.ToInt32( Mathf.Floor( (particle.positionCache.x + xRange) / h) ),
+            Convert.ToInt32( Mathf.Floor( (particle.positionCache.y + yRange) / h) )
+        );
+    }
+
     private void doubleDensityRelaxation() {
 
         foreach (Particle particle in particles) {
 
-            List<Particle> neighbourhood = getNeighbours(particle);
+            List<Particle> neighbourhood = getNeighboursPerf(particle);
 
 
             // Compute density and near density
@@ -93,7 +130,7 @@ public class ParticleManager : MonoBehaviour
 
             foreach (Particle neighbour in neighbourhood) {
 
-                float q = Vector3.Distance(particle.transform.position, neighbour.transform.position) / h;
+                float q = Vector3.Distance(particle.positionCache, neighbour.positionCache) / h;
 
                 if (q < 1) {
                     d += Mathf.Pow(1 - q, 2);
@@ -110,21 +147,56 @@ public class ParticleManager : MonoBehaviour
 
             foreach (Particle neighbour in neighbourhood) {
 
-                float q = Vector3.Distance(particle.transform.position, neighbour.transform.position) / h;
+                float q = Vector3.Distance(particle.positionCache, neighbour.positionCache) / h;
 
                 if (q < 1) {
                     // Apply displacements
-                    Vector3 D = Mathf.Pow(deltaTime, 2) * ( p * (1 - q) + pNear * Mathf.Pow(1 - q, 2) ) * (neighbour.transform.position - particle.transform.position);
-                    neighbour.transform.position += (D / 2);
+                    Vector3 D = Mathf.Pow(deltaTime, 2) * ( p * (1 - q) + pNear * Mathf.Pow(1 - q, 2) ) * (neighbour.positionCache - particle.positionCache);
+                    neighbour.positionCache += (D / 2);
                     dx -= (D / 2);
                 }
 
             }
 
-            particle.transform.position += dx;
+            particle.positionCache += dx;
 
         }
 
+    }
+
+    private List<Particle> getNeighboursPerf(Particle particle) {
+        List<Particle> neighbours = new List<Particle>();
+
+        // Get EVERY CELL AROUND THE CURRENT particle
+        Tuple<int, int> particleCell = getCellFromParticle(particle);
+
+        for (int i = particleCell.Item1 - 1; i < particleCell.Item1 + 2; i++) {
+            for (int j = particleCell.Item2 - 1; j < particleCell.Item2 + 2; j++) {
+
+                Tuple<int, int> tempCell = Tuple.Create(i, j);
+
+                List<Particle> tempCellParticles;
+
+                if (grid.TryGetValue(tempCell, out tempCellParticles)) {
+
+                    foreach (Particle other in tempCellParticles) {
+                        if (other == particle) {
+                            continue;
+                        }
+
+                        if (Vector3.Distance(particle.positionCache, other.positionCache) <= h) {
+                            neighbours.Add(other);
+                        }
+                    }
+
+                }
+                
+
+            }
+        }
+
+
+        return neighbours;
     }
 
     // Return list of neighbours of 'particle' (except itself)
@@ -139,7 +211,7 @@ public class ParticleManager : MonoBehaviour
                 continue;
             }
 
-            if (Vector3.Distance(particle.transform.position, other.transform.position) <= h) {
+            if (Vector3.Distance(particle.positionCache, other.positionCache) <= h) {
                 neighbours.Add(other);
             }
 
@@ -152,23 +224,21 @@ public class ParticleManager : MonoBehaviour
 
         foreach (Particle particle in particles) {
 
-            Vector3 pos = particle.transform.position;
-
-            if (pos.y <= -yRange) {
-                pos.y = -yRange;
+            if (particle.positionCache.y <= -yRange) {
+                particle.positionCache.y = -yRange;
             }
 
-            if (pos.x <= -xRange) {
-                pos.x = -xRange;
+            if (particle.positionCache.x <= -xRange) {
+                particle.positionCache.x = -xRange;
             }
 
-            if (pos.x >= xRange) {
-                pos.x = xRange;
+            if (particle.positionCache.x >= xRange) {
+                particle.positionCache.x = xRange;
             }
 
-            particle.transform.position = pos;
+            particle.velocity = (particle.positionCache - particle.previousPositon) / deltaTime;
 
-            particle.velocity = (particle.transform.position - particle.previousPositon) / deltaTime;
+            particle.transform.position = particle.positionCache;
         }
 
     }
@@ -176,6 +246,8 @@ public class ParticleManager : MonoBehaviour
     private void applyGravity() {
 
         foreach (Particle particle in particles) {
+
+            particle.positionCache = particle.transform.position;
 
             /* lines 1 - 3 */
             //Compute acceleration
@@ -186,10 +258,10 @@ public class ParticleManager : MonoBehaviour
 
 
             /* lines 6 - 10 */
-            particle.previousPositon = particle.transform.position;
+            particle.previousPositon = particle.positionCache;
 
             //Compute next position
-            particle.transform.position = particle.transform.position + deltaTime * particle.velocity;
+            particle.positionCache = particle.transform.position + deltaTime * particle.velocity;
 
         }
 

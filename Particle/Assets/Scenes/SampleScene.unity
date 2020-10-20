@@ -250,11 +250,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   particle: {fileID: 635561389513779978, guid: 61b3a47bea9496e42ba1f3d21c728b05, type: 3}
-  nbParticles: 500
+  nbParticles: 1000
   xRange: 4
   yRange: 4
   h: 1
-  k: 10
+  k: 0.5
   d0: 10
-  kNear: 6
-  deltaTime: 0.1
+  kNear: 60
+  deltaTime: 0.05
