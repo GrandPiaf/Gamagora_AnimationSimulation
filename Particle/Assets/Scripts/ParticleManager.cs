@@ -151,7 +151,7 @@ public class ParticleManager : MonoBehaviour
 
                 if (q < 1) {
                     // Apply displacements
-                    Vector3 D = Mathf.Pow(deltaTime, 2) * ( p * (1 - q) + pNear * Mathf.Pow(1 - q, 2) ) * (neighbour.positionCache - particle.positionCache);
+                    Vector3 D = Mathf.Pow(deltaTime, 2) / particle.mass * ( p * (1 - q) + pNear * Mathf.Pow(1 - q, 2) ) * (neighbour.positionCache - particle.positionCache);
                     neighbour.positionCache += (D / 2);
                     dx -= (D / 2);
                 }
