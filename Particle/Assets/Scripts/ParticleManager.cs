@@ -29,15 +29,33 @@ public class ParticleManager : MonoBehaviour
     public float xRange;
     public float yRange;
 
+    // Distance de recherche du voisinnage
+    // 1 = 1 cube
+    [Range(0, 1000)]
     public float h;
+
+    // Quantifie la force de répulsion du voisinnage
+    [Range(0, 1000)]
     public float k;
+    
+    // La densité de voisinnage d'une particule
+    // Si = 1, elle va attirer les voisins jusqu'à que la densité moyenne autour soit suffisante
+    [Range(0, 1000)]
     public float d0;
+    
+    // "Unpack" les particle qui sont paqués
+    [Range(0, 1000)]
     public float kNear;
 
+
+    [Range(0, 1)]
     public float deltaTime;
+
 
     private Dictionary<Tuple<int, int>, List<Particle>> grid;
 
+    [Range(0, 1000)]
+    public float outsideForce;
 
 
     void Start() {
@@ -75,11 +93,11 @@ public class ParticleManager : MonoBehaviour
 
     void Update() {
 
-        sortParticles();
-
         // Apply gravity
         /* lines 1 - 3  &  lines 6 - 10 */
         applyGravity();
+
+        sortParticles();
 
         /* line 16 */
         doubleDensityRelaxation();
@@ -224,16 +242,24 @@ public class ParticleManager : MonoBehaviour
 
         foreach (Particle particle in particles) {
 
+            // Add force proportionnal to distance between current position & border
+
             if (particle.positionCache.y <= -yRange) {
-                particle.positionCache.y = -yRange;
+                float distY = - particle.positionCache.y;
+                float force = distY * outsideForce * deltaTime * deltaTime / particle.mass;
+                particle.positionCache.y += force;
             }
 
             if (particle.positionCache.x <= -xRange) {
-                particle.positionCache.x = -xRange;
+                float distX = -particle.positionCache.x;
+                float force = distX * outsideForce * deltaTime * deltaTime / particle.mass;
+                particle.positionCache.x += force;
             }
 
             if (particle.positionCache.x >= xRange) {
-                particle.positionCache.x = xRange;
+                float distX = -particle.positionCache.x;
+                float force = distX * outsideForce * deltaTime * deltaTime / particle.mass;
+                particle.positionCache.x += force;
             }
 
             particle.velocity = (particle.positionCache - particle.previousPositon) / deltaTime;
