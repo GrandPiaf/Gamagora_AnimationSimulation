@@ -18,4 +18,12 @@
 
 
 
-![ParticleF](ParticleF.PNG)
+Last result normal :
+
+![ParticleF](ParticleG.PNG)
+
+
+
+Last result with arrays
+
+![ParticleH](ParticleH.PNG)

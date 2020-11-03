@@ -176,7 +176,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 7
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -200,7 +200,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 0, y: -8, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -249,13 +249,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4fceb082a6b6f64e9f751564211f552, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  particle: {fileID: 635561389513779978, guid: 61b3a47bea9496e42ba1f3d21c728b05, type: 3}
+  particlePrefab: {fileID: 8596060201563736470, guid: d3d909eb362abf94cb2b7f587f6655a0, type: 3}
   nbParticles: 1000
   xRange: 10
   yRange: 10
-  h: 0.5
-  k: 0.5
-  d0: 1
-  kNear: 60
-  deltaTime: 0.025
-  outsideForce: 50
+  h: 1.35
+  k: 4.8
+  d0: 8.93
+  kNear: 60.02
+  deltaTime: 0.02
+  outsideForce: 11.21
